@@ -5,8 +5,19 @@ class SceneManager {
     this.currentClass = "";
 
     this.lastDetectedTime = millis();
-    this.idleThreshold = 1 * 30 * 1000; // Tiempo de espera
-    this.idleSceneDuration = 20 * 1000; // Tiempo que se muestra
+    
+    // ========================================
+    // ⏰ TIEMPOS CONFIGURABLES PARA PRUEBAS
+    // ========================================
+    
+    // Tiempo que espera sin detección antes de mostrar imagen idle (en milisegundos)
+    this.idleThreshold = 1 * 5 * 1000; // 30 segundos (cambiar aquí para pruebas)
+    
+    // Tiempo que se muestra cada imagen idle antes de cambiar (en milisegundos)  
+    this.idleSceneDuration = 10 * 1000; // 20 segundos (cambiar aquí para pruebas)
+    
+    // ========================================
+    
     this.idleScene = null;
     this.idleSceneStartTime = null;
     this.idleTexts = []; // la carga vendrá desde fuera
@@ -29,30 +40,22 @@ class SceneManager {
       return;
     }
 
-    // Caso: misma clase que estaba desapareciendo, volver a fadeIn
-    if (
-      this.currentScene &&
-      this.fadeState === "out" &&
-      newClass === this.currentScene.label
-    ) {
-      this.currentScene.startFadeIn();
-      this.fadeState = "in";
-      this.currentClass = newClass;
-      return;
-    }
-
-    // Caso: nueva clase detectada
-    const sceneData = this.content[newClass];
-    if (sceneData) {
-      const newScene = new Scene(sceneData);
-      newScene.label = newClass; // guardar nombre de clase
-      newScene.startFadeIn();
-      this.currentScene = newScene;
-      this.currentClass = newClass;
-      this.fadeState = "in";
-    }
-
+    // Caso: nueva detección - mostrar texto de detección
     if (newClass && newClass !== "" && newClass !== "Control") {
+      // Crear escena con el texto de detección
+      const detectionScene = new Scene({
+        title: "",
+        recepcion: "",
+        comments: [detectionText], // Usar el texto cargado de text01.txt
+        isDetection: true // Marcar como escena de detección
+      });
+      
+      detectionScene.label = newClass;
+      detectionScene.startFadeIn();
+      this.currentScene = detectionScene;
+      this.currentClass = newClass;
+      this.fadeState = "in";
+      
       this.lastDetectedTime = millis();
 
       // Si había escena idle activa, desactívala
@@ -63,9 +66,6 @@ class SceneManager {
         this.idleSceneFadingOut = false;
       }
     }
-
-
-
   }
 
   loadIdleTexts(idleData) {
@@ -89,20 +89,22 @@ class SceneManager {
 
     // Crear escena idle si no hay escena principal ni idle activa
     if (!this.currentScene && !this.idleScene) {
-      if (now - this.lastDetectedTime > this.idleThreshold && this.idleTexts.length > 0) {
-        let frases = random(this.idleTexts);
+      if (now - this.lastDetectedTime > this.idleThreshold && idleImages.length > 0) {
+        // Seleccionar una imagen aleatoria
+        currentIdleImage = random(idleImages);
 
         this.idleScene = new Scene({
           title: "",
           data: [],
-          comments: frases,
-          isIdle: true
+          comments: [],
+          isIdle: true,
+          isImageIdle: true // Nueva propiedad para distinguir escenas idle con imágenes
         });
 
         this.idleScene.startFadeIn();
         this.idleSceneStartTime = now;
         this.idleSceneFadingOut = false;
-        console.log("🟢 Idle scene started");
+        console.log("🟢 Idle image scene started");
       }
     }
 

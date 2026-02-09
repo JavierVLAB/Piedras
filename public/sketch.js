@@ -1,3 +1,34 @@
+// ========================================
+// ⏰ GUÍA DE TIEMPOS CONFIGURABLES PARA PRUEBAS
+// ========================================
+// 
+// 1. TIEMPO ANTES DE MOSTRAR IMAGEN IDLE:
+//    📍 Archivo: SceneManager.js, línea ~15
+//    📍 Variable: this.idleThreshold 
+//    📍 Valor actual: 30 segundos (30 * 1000 ms)
+//
+// 2. DURACIÓN DE CADA IMAGEN IDLE:
+//    📍 Archivo: SceneManager.js, línea ~18  
+//    📍 Variable: this.idleSceneDuration
+//    📍 Valor actual: 20 segundos (20 * 1000 ms)
+//
+// 3. VELOCIDAD DE APARICIÓN (FADE-IN):
+//    📍 Archivo: Scene.js, línea ~15
+//    📍 Variable: this.fadeInSpeed
+//    📍 Valor actual: 10 (más alto = más rápido)
+//
+// 4. VELOCIDAD DE DESAPARICIÓN (FADE-OUT):
+//    📍 Archivo: Scene.js, línea ~18
+//    📍 Variable: this.fadeOutSpeed  
+//    📍 Valor actual: 2 (más alto = más rápido)
+//
+// 5. TIEMPO ENTRE FRASES DE TEXTO:
+//    📍 Archivo: Scene.js, línea ~21
+//    📍 Variable: this.commentInterval
+//    📍 Valor actual: 180 frames = 3 segundos a 60fps
+//
+// ========================================
+
 //let modelURL = './my_model/';
 //let modelURL = 'https://teachablemachine.withgoogle.com/models/2HucpcZdT/';
 //let modelURL = 'https://teachablemachine.withgoogle.com/models/-owFz2BSZ/';
@@ -17,7 +48,7 @@ let sceneManager;
 let contentData;
 
 let rotateScreen = true;
-let rotateCamera = true;
+let rotateCamera = false;
 let screenWidth;
 let screenHeight;
 let fontTitle, fontText;
@@ -31,8 +62,12 @@ let idleData;
 let idleTimer = 0;
 const idleThreshold = 60 * 60 * 3; // 3 minutos a 60fps
 
-// preload() eliminado - p5.js 2.0 requiere cargar archivos en setup() con async/await
+// Variables para las nuevas funcionalidades
+let detectionText = ""; // Contenido de text01.txt
+let idleImages = []; // Array de imágenes para mostrar cuando no hay detección
+let currentIdleImage = null;
 
+// preload() eliminado - p5.js 2.0 requiere cargar archivos en setup() con async/await
 
 
 
@@ -47,6 +82,13 @@ async function setup() {
     idleData = await loadJSON("idleTexts.json?v=" + Date.now());
     fontTitle = await loadFont('assets/fonts/UniversLTStd-BoldCnObl 6.otf');
     fontText = await loadFont('assets/fonts/UniversLTStd-BoldCnObl 6.otf');
+    
+    // Cargar el texto de detección
+    detectionText = await loadStrings("assets/texts/text01.txt");
+    detectionText = detectionText.join(" "); // Convertir array a string
+    
+    // Cargar todas las imágenes de la carpeta assets/images/
+    await loadIdleImages();
     
     console.log("Archivos cargados correctamente");
     console.log("Idle data cargado:", idleData);
@@ -78,39 +120,89 @@ async function setup() {
   }
 }
 
+async function loadIdleImages() {
+  // Lista de nombres de imágenes (basada en lo que encontramos)
+  const imageNames = [
+    "Camisas piedras para app-01.png",
+    "Camisas piedras para app-02.png", 
+    "Camisas piedras para app-03.png",
+    "Camisas piedras para app-04.png",
+    "Camisas piedras para app-05.png",
+    "Camisas piedras para app-06.png",
+    "Camisas piedras para app-07.png",
+    "Camisas piedras para app-08.png",
+    "Camisas piedras para app-09.png",
+    "Camisas piedras para app-10.png",
+    "Camisas piedras para app-11.png",
+    "Camisas piedras para app-12.png",
+    "Camisas piedras para app-14.png"
+  ];
+  
+  console.log("Cargando imágenes idle...");
+  
+  for (let imageName of imageNames) {
+    try {
+      const img = await loadImage("assets/images/" + imageName);
+      idleImages.push(img);
+      console.log("Imagen cargada:", imageName);
+    } catch (error) {
+      console.warn("No se pudo cargar:", imageName, error);
+    }
+  }
+  
+  console.log("Total imágenes cargadas:", idleImages.length);
+}
+
 function draw() {
   background(255);
 
   push();
+  
+  // Aplicar rotación global si está configurada
+  if (rotateScreen) {
+    translate(width, 0);
+    rotate(HALF_PI);
+  }
 
-  // Verificar que las variables estén inicializadas y el video esté listo
+  // Verificar que las variables estén inicializadas
   if (video && screenWidth && screenHeight && !isNaN(screenWidth) && !isNaN(screenHeight)) {
-    if (rotateScreen) {
-      // Rota 90 grados y ajusta el sistema de coordenadas
-
-          // Calcula la altura que estás usando para la imagen
-      let imgHeight = screenHeight * 240 / 320;
-
-      push(); // Guarda la configuración actual de transformación
-
-        // 1. Traslada el origen al borde inferior de la imagen.
-        // El ancho queda en 0, y la altura es la variable imgHeight.
-        translate(0, imgHeight);
-
-        // 2. Aplica el flip vertical escalando por -1 en el eje Y.
-        scale(1, -1);
-
-        // 3. Dibuja la imagen. 
-        // Debido a que el eje Y está invertido, el dibujo comenzará desde el nuevo 0 (que es imgHeight) 
-        // y se extenderá hacia arriba, resultando en el flip vertical.
-        image(video, 0, 0, screenHeight, imgHeight);
-
-      pop(); // Restaura la configuración de transformación anterior
-      translate(width, 0);
-      rotate(HALF_PI);
-    } else {   
-      // Muestra el video sin rotar
-      image(video, 0, 0, screenWidth, screenWidth * 240 / 320);
+    
+    // Solo mostrar la cámara si hay detección activa
+    if (currentClass && currentClass !== "" && currentClass !== "Control") {
+      
+      push();
+      
+      if (rotateCamera) {
+        // Cámara vertical: necesita rotación adicional para mostrarse correctamente
+        if (rotateScreen) {
+          // Monitor vertical + cámara vertical: aplicar flip vertical
+          let imgHeight = screenHeight * 240 / 320;
+          translate(0, imgHeight);
+          scale(1, -1);
+          image(video, 0, 0, screenHeight, imgHeight);
+        } else {
+          // Monitor horizontal + cámara vertical: rotar la imagen del video
+          let imgWidth = screenWidth * 320 / 240;
+          let imgHeight = screenWidth;
+          translate(imgWidth / 2, imgHeight / 2);
+          rotate(-HALF_PI);
+          image(video, -imgHeight / 2, -imgWidth / 2, imgHeight, imgWidth);
+        }
+      } else {
+        // Cámara horizontal: mostrar directamente
+        if (rotateScreen) {
+          // Monitor vertical + cámara horizontal: flip vertical
+          let imgHeight = screenHeight * 240 / 320;
+          translate(0, imgHeight);
+          scale(1, -1);
+          image(video, 0, 0, screenHeight, imgHeight);
+        } else {
+          // Monitor horizontal + cámara horizontal: directo
+          image(video, 0, 0, screenWidth, screenWidth * 240 / 320);
+        }
+      }
+      
+      pop();
     }
     
     if (sceneManager) {
@@ -122,7 +214,11 @@ function draw() {
     fill(0);
     textAlign(CENTER, CENTER);
     textSize(24);
-    text("Cargando...", width / 2, height / 2);
+    if (rotateScreen) {
+      text("Cargando...", screenWidth / 2, screenHeight / 2);
+    } else {
+      text("Cargando...", width / 2, height / 2);
+    }
   }
 
   pop();
