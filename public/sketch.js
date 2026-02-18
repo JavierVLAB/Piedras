@@ -27,6 +27,11 @@
 //    📍 Variable: this.commentInterval
 //    📍 Valor actual: 180 frames = 3 segundos a 60fps
 //
+// 6. TAMAÑO DE LAS IMÁGENES IDLE:
+//    📍 Archivo: Scene.js, línea ~24
+//    📍 Variable: this.idleImageScale
+//    📍 Valor actual: 0.8 (1.0 = pantalla completa, 0.8 = con margen)
+//
 // ========================================
 
 //let modelURL = './my_model/';

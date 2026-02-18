@@ -22,6 +22,9 @@ class Scene {
     // Tiempo entre cambios de frases en texto (en frames a 60fps)
     this.commentInterval = 180; // 180 frames = 3 segundos (cambiar aquí para pruebas)
     
+    // Escala de las imágenes en modo idle (1.0 = tamaño de pantalla, 0.8 = con margen)
+    this.idleImageScale = 1.0; // Cambiar aquí para pruebas de tamaño de imágenes
+    
     // ========================================
 
     // Subtítulos frase por frase
@@ -190,12 +193,12 @@ class Scene {
     let canvasW = screenWidth;
     let canvasH = screenHeight;
     
-    // Calcular dimensiones para centrar la imagen manteniendo proporción
+    // Calcular escala para ajustar la imagen al canvas
     let imgW = currentIdleImage.width;
     let imgH = currentIdleImage.height;
     
-    // Calcular escala para ajustar la imagen al canvas
-    let scale = min(canvasW / imgW, canvasH / imgH) * 0.8; // 0.8 para dejar margen
+    // Calcular escala para ajustar la imagen al canvas usando el parámetro configurable
+    let scale = min(canvasW / imgW, canvasH / imgH) * this.idleImageScale; 
     let displayW = imgW * scale;
     let displayH = imgH * scale;
     
