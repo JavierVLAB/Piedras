@@ -46,7 +46,11 @@ Al ser un proyecto basado en tecnologías web estándar, no requiere compilació
 3.  Inicia tu servidor local apuntando a la carpeta `public/`.
 4.  Abre la dirección en tu navegador (ej. `http://localhost:5500`).
 
----
+5. Usar en mac lo sieguiente para activar el modo kiosk: 
+
+```bash
+open -n -a "Google Chrome" --args --kiosk http://localhost:5500/public
+```
 
 ## ⚙️ Configuración
 
