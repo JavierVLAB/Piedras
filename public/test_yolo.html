@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test YOLOv8/v11 - Piedras</title>
+    <!-- p5.js -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@2.1.2/lib/p5.js"></script>
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        canvas {
+            border: 2px solid #444;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+            max-width: 600px;
+        }
+        .status {
+            font-weight: bold;
+            color: #00ff00;
+        }
+        .loading {
+            color: #ffcc00;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prueba de Detección YOLOv8/v11 (TF.js)</h1>
+    <div id="status-container" class="info">
+        Estado del modelo: <span id="model-status" class="loading">Cargando...</span>
+    </div>
+    
+    <!-- El canvas de p5 se insertará aquí automáticamente -->
+
+    <div class="info">
+        <h3>Instrucciones de prueba:</h3>
+        <ol>
+            <li>Exporta tu modelo desde <b>Ultralytics HUB</b> como <b>TensorFlow.js</b>.</li>
+            <li>Crea una carpeta llamada <code>yolo_model</code> dentro de <code>public/</code>.</li>
+            <li>Copia el archivo <code>model.json</code> y los archivos <code>.bin</code> a esa carpeta.</li>
+            <li>Asegúrate de tener un archivo <code>metadata.json</code> o edita las etiquetas en <code>test_yolo.js</code>.</li>
+        </ol>
+    </div>
+
+    <script src="test_yolo.js"></script>
+</body>
+</html>

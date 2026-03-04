@@ -28,6 +28,42 @@ El sistema se basa en tres pilares fundamentales detallados en las especificacio
 
 ---
 
+## Preparación de deteccion
+
+### ML5.js con teachable machine
+
+### YOLOv8/v11 con Ultralytics HUB
+
+- Tomar las fotos de los objetos a detectar
+- Subir las fotos a Label Studio
+- Crear las etiquetas en Label Studio
+- Colocar las etiquetas en las imagenes
+- Exportar como Yolo con imagenes
+- Crear un archivo data.yaml
+```
+path: /content/datasets/piedras_dataset
+
+train: images/train
+val: images/train
+
+names:
+  0: Blanca
+  1: Piedras
+```
+es importante crear las carpetas train dentro de images y dentro de labels, y llenarlas con las imagenes y las etiquetas respectivamente
+
+- Comprimir esto y subirlo a Ultralytics HUB
+- Crear un modelo, Yolov8n , es el mas pequeño y rapido, ideal para web
+- Entrenar el modelo conectando a google colab
+
+### Notas
+
+si conviertes imagines de HEIC a JPG, hay que hacer esto
+
+```bash
+mogrify -auto-orient -strip *.jpg
+```
+
 ## 🚀 Instalación y Ejecución
 
 Al ser un proyecto basado en tecnologías web estándar, no requiere compilación compleja.
@@ -51,6 +87,23 @@ Al ser un proyecto basado en tecnologías web estándar, no requiere compilació
 ```bash
 open -n -a "Google Chrome" --args --kiosk http://localhost:5500/public
 ```
+
+---
+
+## 🔬 Prueba de Detección YOLO (Ultralytics HUB)
+
+Estamos migrando a un sistema de detección de objetos más robusto usando **YOLOv8/v11** exportado desde **Ultralytics HUB** en formato **TensorFlow.js**.
+
+### Cómo probar el nuevo modelo:
+1.  **Exportación:** Desde Ultralytics HUB, exporta tu modelo entrenado como `TensorFlow.js`.
+2.  **Preparación:**
+    *   Crea una carpeta llamada `public/yolo_model/`.
+    *   Copia dentro los archivos generados: `model.json` y todos los archivos `.bin`.
+3.  **Ejecución de la prueba:**
+    *   Abre en tu navegador: `http://localhost:5500/test_yolo.html` (o la ruta correspondiente de tu servidor local).
+4.  **Ajustes:**
+    *   Si tus clases son diferentes a las de ejemplo, edita la variable `classNames` en `public/test_yolo.js`.
+    *   Puedes ajustar el `CONFIDENCE_THRESHOLD` en `public/test_yolo.js` si el modelo no detecta bien o tiene muchos falsos positivos.
 
 ## ⚙️ Configuración
 

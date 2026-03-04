@@ -23,7 +23,7 @@ class Scene {
     this.commentInterval = 180; // 180 frames = 3 segundos (cambiar aquí para pruebas)
     
     // Escala de las imágenes en modo idle (1.0 = tamaño de pantalla, 0.8 = con margen)
-    this.idleImageScale = 1.0; // Cambiar aquí para pruebas de tamaño de imágenes
+    this.idleImageScale = 1.2; // Cambiar aquí para pruebas de tamaño de imágenes
     
     // ========================================
 
