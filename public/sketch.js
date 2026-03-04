@@ -101,15 +101,15 @@ async function setup() {
     classKeys = Object.keys(contentData);
     
     // Crear captura de video - siguiendo el ejemplo oficial de p5.js
-    video = createCapture(VIDEO);
-    video.size(320, 240);
-    video.hide();
+    // video = createCapture(VIDEO);
+    // video.size(320, 240);
+    // video.hide();
 
     sceneManager = new SceneManager(contentData);
     sceneManager.loadIdleTexts(idleData);
 
     // Cargar modelo ML5
-    classifier = ml5.imageClassifier(modelURL + 'model.json', modelReady);
+    // classifier = ml5.imageClassifier(modelURL + 'model.json', modelReady);
     
   } catch (error) {
     console.error("Error cargando archivos:", error);
@@ -170,10 +170,10 @@ function draw() {
   }
 
   // Verificar que las variables estén inicializadas
-  if (video && screenWidth && screenHeight && !isNaN(screenWidth) && !isNaN(screenHeight)) {
+  if (screenWidth && screenHeight && !isNaN(screenWidth) && !isNaN(screenHeight)) {
     
     // Solo mostrar la cámara si hay detección activa
-    if (currentClass && currentClass !== "" && currentClass !== "Control") {
+    if (video && currentClass && currentClass !== "" && currentClass !== "Control") {
       
       push();
       

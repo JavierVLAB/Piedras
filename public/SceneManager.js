@@ -11,7 +11,7 @@ class SceneManager {
     // ========================================
     
     // Tiempo que espera sin detección antes de mostrar imagen idle (en milisegundos)
-    this.idleThreshold = 1 * 5 * 1000; // 30 segundos (cambiar aquí para pruebas)
+    this.idleThreshold = 1 * 3 * 1000; // 30 segundos (cambiar aquí para pruebas)
     
     // Tiempo que se muestra cada imagen idle antes de cambiar (en milisegundos)  
     this.idleSceneDuration = 10 * 1000; // 20 segundos (cambiar aquí para pruebas)
