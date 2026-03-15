@@ -1,33 +1,18 @@
 class Scene {
   constructor(data) {
-
     this.title = data.title;
     this.date = data.recepcion || "";
     this.dataLines = data.recepcion || [];
     this.commentPhrases = data.comments || data.Testimonio || [];
     
     this.opacity = 0;
-    this.fadeDirection = 0; // 1: fade-in, -1: fade-out
+    this.fadeDirection = 0;
 
-    // ========================================
-    // ⏰ TIEMPOS DE ANIMACIÓN CONFIGURABLES
-    // ========================================
+    this.fadeInSpeed = Config.timing.fadeInSpeed;
+    this.fadeOutSpeed = Config.timing.fadeOutSpeed;
+    this.commentInterval = Config.timing.commentInterval;
+    this.idleImageScale = Config.display.idleImageScale;
     
-    // Velocidad de fade-in (cuanto más alto, más rápido aparece)
-    this.fadeInSpeed = 10; // Cambiar aquí para pruebas
-    
-    // Velocidad de fade-out (cuanto más alto, más rápido desaparece)  
-    this.fadeOutSpeed = 2; // Cambiar aquí para pruebas
-    
-    // Tiempo entre cambios de frases en texto (en frames a 60fps)
-    this.commentInterval = 180; // 180 frames = 3 segundos (cambiar aquí para pruebas)
-    
-    // Escala de las imágenes en modo idle (1.0 = tamaño de pantalla, 0.8 = con margen)
-    this.idleImageScale = 1.0; // Cambiar aquí para pruebas de tamaño de imágenes
-    
-    // ========================================
-
-    // Subtítulos frase por frase
     this.commentIndex = 0;
     this.commentTimer = 0;
 
@@ -45,7 +30,6 @@ class Scene {
   }
 
   update() {
-    // Fade usando velocidades configurables
     if (this.fadeDirection === 1) {
       this.opacity += this.fadeInSpeed;
       if (this.opacity >= 255) {
@@ -62,7 +46,6 @@ class Scene {
       }
     }
 
-    // Avance de frases
     if (this.opacity > 0 && this.commentPhrases.length > 0) {
       this.commentTimer++;
       if (this.commentTimer >= this.commentInterval) {
@@ -96,46 +79,45 @@ class Scene {
 
     this.renderTitle();
     this.renderDate();
-    //this.renderData();
     this.renderComment();
   }
 
   renderTitle() {
-    const x = screenWidth / 6;
-    const y = screenHeight / 6;
+    const x = app.screenWidth / 6;
+    const y = app.screenHeight / 6;
 
     this.drawTextWithBackground(this.title, x, y, {
-      fontSize: 40,
-      font: fontTitle,
+      fontSize: Config.display.titleFontSize,
+      font: app.fontTitle,
       align: LEFT,
       baseline: CENTER,
     });
   }
 
   renderDate() {
-    const x = screenWidth / 6 - 40;
-    const y = screenHeight / 6 + 60;
-    //console.log(this.date);
+    const x = app.screenWidth / 6 - 40;
+    const y = app.screenHeight / 6 + 60;
+
     this.drawTextWithBackground(this.date, x, y, {
-      fontSize: 40,
-      font: fontTitle,
+      fontSize: Config.display.titleFontSize,
+      font: app.fontTitle,
       align: LEFT,
       baseline: CENTER,
     });
   }
 
   renderData() {
-    const startX = screenWidth / 6 - 40;
-    let y = screenHeight / 6 + 40;
+    const startX = app.screenWidth / 6 - 40;
+    let y = app.screenHeight / 6 + 40;
 
     for (let line of this.dataLines) {
       this.drawTextWithBackground(line, startX, y, {
-        fontSize: 40,
-        font: fontText,
+        fontSize: Config.display.titleFontSize,
+        font: app.fontText,
         align: LEFT,
         baseline: TOP
       });
-      y += 50; // espacio entre líneas
+      y += 50;
     }
   }
 
@@ -143,30 +125,24 @@ class Scene {
     if (this.commentPhrases.length === 0) return;
 
     const comment = this.commentPhrases[this.commentIndex];
-    const x = screenWidth / 2;
-    const y = 5 * screenHeight / 6;
+    const x = app.screenWidth / 2;
+    const y = 5 * app.screenHeight / 6;
 
     this.drawTextWithBackground(comment, x, y, {
-      fontSize: 35,
+      fontSize: Config.display.commentFontSize,
       align: CENTER,
       baseline: CENTER
     });
   }
 
-  fadeOut() {
-    if (this.opacity > 0) {
-      this.opacity -= this.fadeSpeed;
-    }
-  }
-
   renderIdle() {
     push();
     textAlign(CENTER, TOP);
-    textSize(35);
-    textFont(fontText);
+    textSize(Config.display.commentFontSize);
+    textFont(app.fontText);
 
-    let lineHeight = 60;
-    let startY = 200;
+    const lineHeight = 60;
+    const startY = 200;
 
     for (let i = 0; i < this.commentPhrases.length; i++) {
       let line = this.commentPhrases[i];
@@ -175,8 +151,8 @@ class Scene {
       this.drawTextWithBackground(line, 75, y, {
         align: LEFT,
         baseline: CENTER,
-        fontSize: 35,
-        font: fontText
+        fontSize: Config.display.commentFontSize,
+        font: app.fontText
       });
     }
 
@@ -184,61 +160,53 @@ class Scene {
   }
   
   renderIdleImage() {
-    if (!currentIdleImage) return;
+    if (!app.currentIdleImage) return;
     
     push();
-    tint(255, this.opacity); // Aplicar fade a la imagen
+    tint(255, this.opacity);
     
-    // La rotación global ya se aplica en draw(), aquí solo centramos
-    let canvasW = screenWidth;
-    let canvasH = screenHeight;
+    const canvasW = app.screenWidth;
+    const canvasH = app.screenHeight;
     
-    // Calcular escala para ajustar la imagen al canvas
-    let imgW = currentIdleImage.width;
-    let imgH = currentIdleImage.height;
+    const imgW = app.currentIdleImage.width;
+    const imgH = app.currentIdleImage.height;
     
-    // Calcular escala para ajustar la imagen al canvas usando el parámetro configurable
-    let scale = min(canvasW / imgW, canvasH / imgH) * this.idleImageScale; 
-    let displayW = imgW * scale;
-    let displayH = imgH * scale;
+    const scale = min(canvasW / imgW, canvasH / imgH) * this.idleImageScale;
+    const displayW = imgW * scale;
+    const displayH = imgH * scale;
     
-    // Centrar la imagen
-    let x = (canvasW - displayW) / 2;
-    let y = (canvasH - displayH) / 2;
+    const x = (canvasW - displayW) / 2;
+    const y = (canvasH - displayH) / 2;
     
-    image(currentIdleImage, x, y, displayW, displayH);
+    image(app.currentIdleImage, x, y, displayW, displayH);
     
-    noTint(); // Quitar tint
+    noTint();
     pop();
   }
   
   renderDetection() {
-    // Renderizar el texto de detección igual que los comentarios normales
     if (this.commentPhrases.length === 0) return;
 
     const comment = this.commentPhrases[this.commentIndex];
-    
-    // La rotación global ya se aplica en draw(), aquí solo centramos
-    const x = screenWidth / 2;
-    const y = screenHeight / 2;
+    const x = app.screenWidth / 2;
+    const y = app.screenHeight / 2;
 
     this.drawTextWithBackground(comment, x, y, {
-      fontSize: 35,
+      fontSize: Config.display.commentFontSize,
       align: CENTER,
       baseline: CENTER,
       textColor: [255, this.opacity],
-      bgColor: [0, this.opacity * 0.8], // Fondo semi-transparente
-      maxWidth: 600 // Limitar ancho del texto
+      bgColor: [0, this.opacity * 0.8],
+      maxWidth: Config.display.maxTextWidth
     });
   }
-
 
   drawTextWithBackground(txt, x, y, options = {}) {
     const {
       align = CENTER,
       baseline = CENTER,
       fontSize = 32,
-      font = fontText,
+      font = app.fontText,
       textColor = [255, this.opacity],
       bgColor = [0, this.opacity],
       padding = 30,
@@ -254,58 +222,52 @@ class Scene {
     let w = textWidth(txt);
     let h = fontSize + 10;
 
-    // Si hay maxWidth y el texto es más ancho, dividir en líneas
     if (maxWidth && w > maxWidth) {
       lines = this.wrapText(txt, maxWidth);
       w = maxWidth;
-      h = (fontSize + 10) * lines.length + (lines.length - 1) * 5; // 5px entre líneas
+      h = (fontSize + 10) * lines.length + (lines.length - 1) * 5;
     }
 
     let rectX, rectY, textX, textY;
 
-    // === Horizontal alignment ===
     if (align === LEFT) {
       rectX = x;
       textX = x + padding / 2;
     } else if (align === RIGHT) {
       rectX = x - w - padding;
       textX = x - padding / 2;
-    } else { // CENTER
+    } else {
       rectX = x - (w + padding) / 2;
       textX = x;
     }
 
-    // === Vertical alignment ===
     if (baseline === TOP) {
       rectY = y;
       textY = y + (fontSize + 10) / 2;
     } else if (baseline === BOTTOM) {
       rectY = y - h;
       textY = y - h + (fontSize + 10) / 2;
-    } else { // CENTER
+    } else {
       rectY = y - h / 2;
       textY = y - h / 2 + (fontSize + 10) / 2;
     }
 
-    // Fondo
     noStroke();
     fill(...bgColor);
     rectMode(CORNER);
     rect(rectX, rectY, w + padding, h, cornerRadius);
 
-    // Texto multilínea
     fill(...textColor);
     textAlign(align, CENTER);
     
     for (let i = 0; i < lines.length; i++) {
-      let lineY = textY + i * (fontSize + 15); // 15px entre líneas
+      let lineY = textY + i * (fontSize + 15);
       text(lines[i], textX, lineY);
     }
     
     pop();
   }
 
-  // Método auxiliar para dividir texto en líneas
   wrapText(txt, maxWidth) {
     let words = txt.split(' ');
     let lines = [];
@@ -320,7 +282,6 @@ class Scene {
           lines.push(currentLine);
           currentLine = word;
         } else {
-          // Palabra muy larga, la agregamos tal como está
           lines.push(word);
         }
       }
@@ -332,9 +293,6 @@ class Scene {
     
     return lines;
   }
-
-
-
 }
 
 function splitTestimonioIntoChunks(text, maxLen = 90) {
@@ -344,7 +302,6 @@ function splitTestimonioIntoChunks(text, maxLen = 90) {
     .filter(s => s.length > 0)
     .flatMap(sentence => {
       if (sentence.length <= maxLen) return [sentence];
-      // Si es muy larga, dividir sin romper palabras
       const words = sentence.split(' ');
       const chunks = [];
       let current = '';
