@@ -45,8 +45,8 @@ const Config = {
       "Camisas piedras para app-22.jpg"
     ],
     videoNames: [
-      "Video png rombo.mp4",
-      "Video png rombo 2.mp4"
+      // "Video png rombo.mp4",
+      // "Video png rombo 2.mp4"
     ],
   },
 
