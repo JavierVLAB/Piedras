@@ -1,5 +1,8 @@
 async function setup() {
   createCanvas(windowWidth, windowHeight);
+  // Mejor calidad de interpolación al escalar imágenes
+  drawingContext.imageSmoothingEnabled = true;
+  drawingContext.imageSmoothingQuality = 'high';
   
   try {
     await app.loadAssets();
