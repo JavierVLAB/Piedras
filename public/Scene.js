@@ -19,10 +19,17 @@ class Scene {
     this.isIdle = data?.isIdle || false;
     this.isImageIdle = data?.isImageIdle || false;
     this.isDetection = data?.isDetection || false;
+    // Asset idle: { type: 'image'|'video', asset }
+    this.idleAsset = data?.idleAsset || null;
   }
 
   startFadeIn() {
     this.fadeDirection = 1;
+    // Si es un video idle, arrancarlo en loop desde el principio
+    if (this.isImageIdle && this.idleAsset?.type === 'video') {
+      this.idleAsset.asset.time(0);
+      this.idleAsset.asset.loop();
+    }
   }
 
   startFadeOut() {
@@ -43,6 +50,10 @@ class Scene {
         this.fadeDirection = 0;
         this.commentIndex = 0;
         this.commentTimer = 0;
+        // Pausar el video al terminar el fade out
+        if (this.isImageIdle && this.idleAsset?.type === 'video') {
+          this.idleAsset.asset.pause();
+        }
       }
     }
 
@@ -160,26 +171,28 @@ class Scene {
   }
   
   renderIdleImage() {
-    if (!app.currentIdleImage) return;
-    
+    if (!this.idleAsset) return;
+
+    const asset = this.idleAsset.asset;
+
     push();
     tint(255, this.opacity);
-    
+
     const canvasW = app.screenWidth;
     const canvasH = app.screenHeight;
-    
-    const imgW = app.currentIdleImage.width;
-    const imgH = app.currentIdleImage.height;
-    
+
+    const imgW = asset.width;
+    const imgH = asset.height;
+
     const scale = min(canvasW / imgW, canvasH / imgH) * this.idleImageScale;
     const displayW = imgW * scale;
     const displayH = imgH * scale;
-    
+
     const x = (canvasW - displayW) / 2;
     const y = (canvasH - displayH) / 2;
-    
-    image(app.currentIdleImage, x, y, displayW, displayH);
-    
+
+    image(asset, x, y, displayW, displayH);
+
     noTint();
     pop();
   }

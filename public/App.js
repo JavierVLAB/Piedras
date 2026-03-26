@@ -7,8 +7,8 @@ class App {
     this.sceneManager = null;
     this.contentData = null;
     this.idleData = null;
-    this.idleImages = [];
-    this.currentIdleImage = null;
+    // Pool unificado de assets idle: cada entrada es { type: 'image'|'video', asset }
+    this.idleAssets = [];
     this.fontTitle = null;
     this.fontText = null;
     this.detectionText = "";
@@ -40,7 +40,7 @@ class App {
     this.detectionText = await loadStrings(Config.assets.textFile);
     this.detectionText = this.detectionText.join(" ");
     
-    await this.loadIdleImages();
+    await this.loadIdleAssets();
     
     console.log("Archivos cargados correctamente");
     console.log("Idle data cargado:", this.idleData);
@@ -48,20 +48,33 @@ class App {
     this.isReady = true;
   }
 
-  async loadIdleImages() {
-    console.log("Cargando imágenes idle...");
-    
+  async loadIdleAssets() {
+    console.log("Cargando assets idle (imágenes y videos)...");
+
     for (let imageName of Config.assets.imageNames) {
       try {
         const img = await loadImage(Config.assets.imagesFolder + imageName);
-        this.idleImages.push(img);
+        this.idleAssets.push({ type: 'image', asset: img });
         console.log("Imagen cargada:", imageName);
       } catch (error) {
-        console.warn("No se pudo cargar:", imageName, error);
+        console.warn("No se pudo cargar imagen:", imageName, error);
       }
     }
-    
-    console.log("Total imágenes cargadas:", this.idleImages.length);
+
+    for (let videoName of (Config.assets.videoNames || [])) {
+      try {
+        const vid = await new Promise((resolve, reject) => {
+          const v = createVideo(Config.assets.imagesFolder + videoName, () => resolve(v));
+          v.hide(); // ocultar el elemento HTML nativo
+        });
+        this.idleAssets.push({ type: 'video', asset: vid });
+        console.log("Video cargado:", videoName);
+      } catch (error) {
+        console.warn("No se pudo cargar video:", videoName, error);
+      }
+    }
+
+    console.log("Total assets idle cargados:", this.idleAssets.length);
   }
 
   getClassKeys() {
@@ -74,10 +87,10 @@ class App {
     }
   }
 
-  selectRandomIdleImage() {
-    if (this.idleImages.length > 0) {
-      this.currentIdleImage = random(this.idleImages);
-    }
+  // Devuelve un asset idle aleatorio { type, asset }, o null si no hay ninguno
+  selectNextIdleAsset() {
+    if (this.idleAssets.length === 0) return null;
+    return random(this.idleAssets);
   }
 
   async startCamera() {

@@ -12,7 +12,7 @@ async function setup() {
       await app.startCamera();
     }
     
-    if (Config.video.enableDetection) {
+    if (Config.video.enableDetection && Config.video.enableCamera) {
       await app.loadModel();
     }
     
@@ -22,7 +22,7 @@ async function setup() {
 }
 
 function draw() {
-  background(255);
+  background(255,0,0);
 
   push();
   
@@ -74,5 +74,10 @@ function keyPressed() {
 
   if (newClass) {
     app.updateDetectedClass(newClass);
+  }
+
+  // Space: saltar al siguiente asset idle
+  if (key === ' ' && app.sceneManager) {
+    app.sceneManager.forceNextIdleScene();
   }
 }

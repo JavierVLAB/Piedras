@@ -12,6 +12,7 @@ class SceneManager {
     this.idleSceneStartTime = null;
     this.idleTexts = [];
     this.fadeState = "none";
+    this._forceNextIdle = false; // flag para saltar al siguiente idle inmediatamente
   }
 
   updateDetectedClass(newClass) {
@@ -70,21 +71,22 @@ class SceneManager {
     }
 
     if (!this.currentScene && !this.idleScene) {
-      if (now - this.lastDetectedTime > this.idleThreshold && app.idleImages.length > 0) {
-        app.selectRandomIdleImage();
+      if (now - this.lastDetectedTime > this.idleThreshold && app.idleAssets.length > 0) {
+        const asset = app.selectNextIdleAsset();
 
         this.idleScene = new Scene({
           title: "",
           data: [],
           comments: [],
           isIdle: true,
-          isImageIdle: true
+          isImageIdle: true,
+          idleAsset: asset
         });
 
         this.idleScene.startFadeIn();
         this.idleSceneStartTime = now;
         this.idleSceneFadingOut = false;
-        console.log("🟢 Idle image scene started");
+        console.log("🟢 Idle scene started:", asset.type);
       }
     }
 
@@ -102,7 +104,9 @@ class SceneManager {
         this.idleScene = null;
         this.idleSceneStartTime = null;
         this.idleSceneFadingOut = false;
-        this.lastDetectedTime = millis();
+        // Si se forzó el cambio con Space, arrancar la siguiente sin esperar el threshold
+        this.lastDetectedTime = this._forceNextIdle ? 0 : millis();
+        this._forceNextIdle = false;
       }
     }
   }
@@ -113,6 +117,20 @@ class SceneManager {
     }
     if (!this.currentScene && this.idleScene) {
       this.idleScene.render();
+    }
+  }
+
+  // Llamado al pulsar Space: salta al siguiente asset idle
+  forceNextIdleScene() {
+    if (this.idleScene) {
+      if (!this.idleSceneFadingOut) {
+        this.idleScene.startFadeOut();
+        this.idleSceneFadingOut = true;
+      }
+      this._forceNextIdle = true;
+    } else {
+      // No hay idle scene activa: forzar que el threshold ya haya pasado
+      this.lastDetectedTime = 0;
     }
   }
 }

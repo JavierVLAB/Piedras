@@ -36,19 +36,17 @@ const Config = {
     fontFile: "assets/fonts/UniversLTStd-BoldCnObl 6.otf",
     imagesFolder: "assets/images/",
     imageNames: [
-      "Camisas piedras para app-01.png",
-      "Camisas piedras para app-02.png",
-      "Camisas piedras para app-03.png",
-      "Camisas piedras para app-04.png",
-      "Camisas piedras para app-05.png",
-      "Camisas piedras para app-06.png",
-      "Camisas piedras para app-07.png",
-      "Camisas piedras para app-08.png",
-      "Camisas piedras para app-09.png",
-      "Camisas piedras para app-10.png",
-      "Camisas piedras para app-11.png",
-      "Camisas piedras para app-12.png",
-      "Camisas piedras para app-14.png",
+      "Camisas piedras para app-15.jpg",
+      "Camisas piedras para app-16.jpg",
+      "Camisas piedras para app-17.jpg",
+      "Camisas piedras para app-18.jpg",
+      "Camisas piedras para app-19.jpg",
+      "Camisas piedras para app-21.jpg",
+      "Camisas piedras para app-22.jpg"
+    ],
+    videoNames: [
+      "Video png rombo.mp4",
+      "Video png rombo 2.mp4"
     ],
   },
 
